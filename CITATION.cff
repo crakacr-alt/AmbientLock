@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use AmbientLock in research, cite the repository and exact version or commit."
+title: "AmbientLock"
+type: software
+version: 0.1.0
+date-released: 2026-09-25
+authors:
+  - family-names: "crakacr-alt"
+repository-code: "https://github.com/crakacr-alt/AmbientLock"
+license: MIT
