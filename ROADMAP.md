@@ -24,7 +24,7 @@
 
 - [ ] eBPF backend как optional Linux tracer
 - [ ] file descriptor lifecycle
-- [ ] `chdir/fchdir` aware relative paths
+- [x] resolved relative paths for successful open/openat via `strace -yy`
 - [ ] subprocess tree visualization
 - [ ] различать connect attempt и established connection точнее
 
