@@ -13,7 +13,7 @@
 или начинает подключаться к новому IP-адресу. AmbientLock делает такие изменения
 видимыми в Git и CI.
 
-> **Версия:** 0.1.2  
+> **Версия:** 0.2.0  
 > **Статус:** рабочий Linux MVP, не sandbox и не система предотвращения атак.
 
 ## Зачем это нужно
@@ -42,7 +42,7 @@ source code + declared packages
       diff / enforce
 ```
 
-## Что умеет v0.1.2
+## Что умеет v0.2.0
 
 - запускает любую команду под `strace`;
 - отслеживает успешные `execve`, `open/openat/creat`, `connect`;
@@ -55,7 +55,7 @@ source code + declared packages
 - создаёт детерминированно отсортированный `ambient.lock`;
 - показывает `diff` между baseline и новым запуском;
 - в `enforce` возвращает ошибку, если программа получила новую capability;
-- имеет unit tests, integration test и GitHub Actions CI.
+- имеет unit tests, integration test и GitHub Actions CI;\n- поддерживает `.ambientignore`, чтобы не хранить стабильный шум;\n- умеет сохранять diff/enforce результат в JSON для CI и других инструментов.
 
 ## Установка
 
@@ -124,6 +124,55 @@ enforce failed: new ambient capabilities detected
 
 `enforce` в этом случае завершится кодом `4`.
 
+## Убираем шум через .ambientignore
+
+По умолчанию AmbientLock ищет `.ambientignore` в текущем каталоге. Если файла
+нет — ничего не меняется.
+
+Пример:
+
+```text
+# обычная строка = read + write
+./.cache/**
+
+write ./tmp/**
+env CI_*
+network ipv4:127.0.0.1:*
+```
+
+Поддерживаются типы `file`, `read`, `write`, `exec`, `env`, `network`.
+`*` не пересекает `/`, а `**` может матчить несколько каталогов.
+
+Другой файл правил:
+
+```bash
+./ambient diff --ignore ci.ambientignore -- python3 app.py
+```
+
+Полностью отключить правила:
+
+```bash
+./ambient diff --no-ignore -- python3 app.py
+```
+
+## JSON-отчёт для CI
+
+```bash
+./ambient enforce \
+  --json-report ambient-report.json \
+  -- python3 app.py
+```
+
+В JSON отдельно есть:
+
+- `changed`;
+- `new_capabilities`;
+- `strict_env`;
+- добавленные/удалённые executables, files, network и ENV names.
+
+Exit codes при этом остаются прежними, поэтому JSON можно использовать как
+артефакт CI, а exit code — как gate.
+
 ## Формат ambient.lock
 
 Это JSON с обычным именем `ambient.lock`, поэтому его удобно читать человеку и
@@ -135,7 +184,7 @@ enforce failed: new ambient capabilities detected
 {
   "schema": 1,
   "tool": "ambientlock",
-  "tool_version": "0.1.2",
+  "tool_version": "0.2.0",
   "command": ["python3", "app.py"],
   "executables": ["/usr/bin/python3.12"],
   "filesystem": {
@@ -153,7 +202,7 @@ enforce failed: new ambient capabilities detected
 
 ## Важное ограничение `enforce`
 
-В v0.1 `enforce` — **detective control**, а не preventive sandbox.
+В v0.2 `enforce` — **detective control**, а не preventive sandbox.
 
 То есть программа сначала выполняется под наблюдением, затем AmbientLock проверяет
 новые capabilities и возвращает ненулевой exit code. Системный вызов пока не
@@ -165,7 +214,7 @@ README специально не выдаёт текущий MVP за готов
 ## Что именно считается ENV-зависимостью
 
 На syscall-уровне нельзя честно определить каждый вызов `getenv()` обычным
-`strace`. Поэтому v0.1 называет поле `exposed_names`: это имена переменных,
+`strace`. Поэтому v0.2 называет поле `exposed_names`: это имена переменных,
 которые были переданы через `execve`.
 
 Значения не сохраняются никогда. По этой же причине новые ENV names видны в
