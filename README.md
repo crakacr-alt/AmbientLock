@@ -1,5 +1,9 @@
 # AmbientLock
 
+[![CI](https://github.com/crakacr-alt/AmbientLock/actions/workflows/ci.yml/badge.svg)](https://github.com/crakacr-alt/AmbientLock/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/crakacr-alt/AmbientLock/actions/workflows/codeql.yml/badge.svg)](https://github.com/crakacr-alt/AmbientLock/actions/workflows/codeql.yml)
+
+
 **AmbientLock** — экспериментальный open-source инструмент, который создаёт
 `ambient.lock`: версионируемый контракт скрытых зависимостей обычной программы.
 
@@ -9,7 +13,7 @@
 или начинает подключаться к новому IP-адресу. AmbientLock делает такие изменения
 видимыми в Git и CI.
 
-> **Версия:** 0.1.1  
+> **Версия:** 0.1.2  
 > **Статус:** рабочий Linux MVP, не sandbox и не система предотвращения атак.
 
 ## Зачем это нужно
@@ -38,7 +42,7 @@ source code + declared packages
       diff / enforce
 ```
 
-## Что умеет v0.1.1
+## Что умеет v0.1.2
 
 - запускает любую команду под `strace`;
 - отслеживает успешные `execve`, `open/openat/creat`, `connect`;
@@ -131,7 +135,7 @@ enforce failed: new ambient capabilities detected
 {
   "schema": 1,
   "tool": "ambientlock",
-  "tool_version": "0.1.1",
+  "tool_version": "0.1.2",
   "command": ["python3", "app.py"],
   "executables": ["/usr/bin/python3.12"],
   "filesystem": {
@@ -214,7 +218,7 @@ go test -race ./...
 go build ./cmd/ambient
 ```
 
-Tag `v*` запускает release workflow, который собирает Linux amd64/arm64 binaries и SHA256SUMS.
+Tag `v*` запускает release workflow, который повторно проверяет проект, собирает Linux amd64/arm64 binaries, считает SHA256SUMS и создаёт GitHub Release.
 
 ## Безопасность и приватность
 
@@ -238,7 +242,7 @@ AmbientLock не отправляет телеметрию и не требуе�
 7. Windows ETW backend;
 8. PR-friendly SARIF/GitHub annotation output.
 
-Полный план: [ROADMAP.md](ROADMAP.md).
+Полный план: [ROADMAP.md](ROADMAP.md).\n\nКак готовить версии: [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md).
 
 ## Научная и инженерная честность
 

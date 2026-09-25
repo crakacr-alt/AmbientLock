@@ -14,7 +14,7 @@
 ## v0.2 — удобство реального проекта
 
 - [ ] `.ambientignore`
-- [ ] workspace-relative path mode
+- [x] workspace-relative path mode
 - [ ] `ambient explain <resource>`
 - [ ] JSON/SARIF report для CI
 - [ ] DNS correlation: IP -> hostname, когда это можно наблюдать надёжно
