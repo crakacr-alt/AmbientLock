@@ -1,0 +1,7 @@
+# Обычная строка применяется к read и write.
+./.cache/**
+
+# Можно указать конкретный тип capability.
+write ./tmp/**
+env CI_*
+network ipv4:127.0.0.1:*
