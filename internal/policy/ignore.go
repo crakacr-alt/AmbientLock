@@ -12,9 +12,8 @@ import (
 )
 
 type rule struct {
-	kind    string
-	pattern string
-	re      *regexp.Regexp
+	kind string
+	re   *regexp.Regexp
 }
 
 // Rules is the parsed .ambientignore file.
@@ -60,7 +59,7 @@ func Load(path string) (Rules, error) {
 		if err != nil {
 			return Rules{}, fmt.Errorf("%s:%d: %w", path, lineNumber, err)
 		}
-		rules.items = append(rules.items, rule{kind: kind, pattern: pattern, re: re})
+		rules.items = append(rules.items, rule{kind: kind, re: re})
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -71,13 +70,19 @@ func Load(path string) (Rules, error) {
 
 func splitRule(line string) (string, string) {
 	fields := strings.Fields(line)
-	if len(fields) >= 2 {
-		switch fields[0] {
-		case "file", "read", "write", "exec", "env", "network":
-			return fields[0], strings.TrimSpace(line[len(fields[0]):])
-		}
+	if len(fields) == 0 {
+		return "file", ""
 	}
-	return "file", line
+
+	switch fields[0] {
+	case "file", "read", "write", "exec", "env", "network":
+		if len(fields) == 1 {
+			return fields[0], ""
+		}
+		return fields[0], strings.TrimSpace(line[len(fields[0]):])
+	default:
+		return "file", line
+	}
 }
 
 func compileGlob(pattern string) (*regexp.Regexp, error) {
