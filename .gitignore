@@ -1,0 +1,16 @@
+# Build output
+/bin/
+/ambient
+/ambient.exe
+
+# AmbientLock trace/debug files
+*.trace
+
+# IDEs
+.vscode/
+.idea/
+.vs/
+
+# OS files
+.DS_Store
+Thumbs.db
