@@ -55,7 +55,9 @@ source code + declared packages
 - создаёт детерминированно отсортированный `ambient.lock`;
 - показывает `diff` между baseline и новым запуском;
 - в `enforce` возвращает ошибку, если программа получила новую capability;
-- имеет unit tests, integration test и GitHub Actions CI;\n- поддерживает `.ambientignore`, чтобы не хранить стабильный шум;\n- умеет сохранять diff/enforce результат в JSON для CI и других инструментов.
+- имеет unit tests, integration test и GitHub Actions CI;
+- поддерживает `.ambientignore`, чтобы не хранить стабильный шум;
+- умеет сохранять diff/enforce результат в JSON для CI и других инструментов.
 
 ## Установка
 
@@ -291,7 +293,9 @@ AmbientLock не отправляет телеметрию и не требуе�
 7. Windows ETW backend;
 8. PR-friendly SARIF/GitHub annotation output.
 
-Полный план: [ROADMAP.md](ROADMAP.md).\n\nКак готовить версии: [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md).
+Полный план: [ROADMAP.md](ROADMAP.md).
+
+Как готовить версии: [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md).
 
 ## Научная и инженерная честность
 
