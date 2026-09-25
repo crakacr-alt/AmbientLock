@@ -22,7 +22,7 @@ func TestBuildReportStrictEnv(t *testing.T) {
 }
 
 func TestSaveReportProducesJSON(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "report.json")
+	path := filepath.Join(t.TempDir(), "artifacts", "report.json")
 	report := BuildReport(ChangeSet{AddedReads: []string{"./config.yaml"}}, false)
 
 	if err := SaveReport(path, report); err != nil {
