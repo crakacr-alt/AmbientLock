@@ -16,7 +16,8 @@
 - [x] `.ambientignore`
 - [x] workspace-relative path mode
 - [ ] `ambient explain <resource>`
-- [x] JSON report для CI\n- [ ] SARIF annotations для GitHub Code Scanning
+- [x] JSON report для CI
+- [ ] SARIF annotations для GitHub Code Scanning
 - [ ] DNS correlation: IP -> hostname, когда это можно наблюдать надёжно
 - [ ] golden integration fixtures для Python/Node/Go
 
