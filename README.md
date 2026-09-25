@@ -9,7 +9,7 @@
 или начинает подключаться к новому IP-адресу. AmbientLock делает такие изменения
 видимыми в Git и CI.
 
-> **Версия:** 0.1.0  
+> **Версия:** 0.1.1  
 > **Статус:** рабочий Linux MVP, не sandbox и не система предотвращения атак.
 
 ## Зачем это нужно
@@ -38,7 +38,7 @@ source code + declared packages
       diff / enforce
 ```
 
-## Что умеет v0.1.0
+## Что умеет v0.1.1
 
 - запускает любую команду под `strace`;
 - отслеживает успешные `execve`, `open/openat/creat`, `connect`;
@@ -131,7 +131,7 @@ enforce failed: new ambient capabilities detected
 {
   "schema": 1,
   "tool": "ambientlock",
-  "tool_version": "0.1.0",
+  "tool_version": "0.1.1",
   "command": ["python3", "app.py"],
   "executables": ["/usr/bin/python3.12"],
   "filesystem": {
