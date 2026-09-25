@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "tool": "ambientlock",
+  "tool_version": "0.1.0",
+  "command": ["python3", "app.py"],
+  "platform": {
+    "os": "linux",
+    "arch": "amd64"
+  },
+  "executables": ["/usr/bin/python3"],
+  "filesystem": {
+    "reads": ["./config.yaml"],
+    "writes": ["./cache/result.json"]
+  },
+  "network": [
+    {"family": "ipv4", "address": "203.0.113.10", "port": 443}
+  ],
+  "environment": {
+    "exposed_names": ["HOME", "PATH", "DATABASE_URL"]
+  }
+}
