@@ -30,6 +30,7 @@ func TestRunnerSeesExecutableAndFileRead(t *testing.T) {
 	if result.ExitCode != 0 {
 		t.Fatalf("unexpected child exit code: %d", result.ExitCode)
 	}
+
 	if !contains(result.Observation.Executables, catPath) {
 		t.Fatalf("executable %q not observed: %#v", catPath, result.Observation.Executables)
 	}
@@ -40,7 +41,9 @@ func TestRunnerSeesExecutableAndFileRead(t *testing.T) {
 
 func contains(values []string, target string) bool {
 	for _, value := range values {
-		if value == target { return true }
+		if value == target {
+			return true
+		}
 	}
 	return false
 }
