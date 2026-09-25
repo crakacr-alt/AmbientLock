@@ -11,16 +11,16 @@ import (
 // "Added" capabilities are the important part for CI enforcement; "Removed" items
 // are still shown because they often explain why a dependency disappeared.
 type ChangeSet struct {
-	AddedExecutables   []string `json:"added_executables"`
-	RemovedExecutables []string `json:"removed_executables"`
-	AddedReads         []string `json:"added_reads"`
-	RemovedReads       []string `json:"removed_reads"`
-	AddedWrites        []string `json:"added_writes"`
-	RemovedWrites      []string `json:"removed_writes"`
+	AddedExecutables   []string                `json:"added_executables"`
+	RemovedExecutables []string                `json:"removed_executables"`
+	AddedReads         []string                `json:"added_reads"`
+	RemovedReads       []string                `json:"removed_reads"`
+	AddedWrites        []string                `json:"added_writes"`
+	RemovedWrites      []string                `json:"removed_writes"`
 	AddedNetwork       []model.NetworkEndpoint `json:"added_network"`
 	RemovedNetwork     []model.NetworkEndpoint `json:"removed_network"`
-	AddedEnvNames      []string `json:"added_env_names"`
-	RemovedEnvNames    []string `json:"removed_env_names"`
+	AddedEnvNames      []string                `json:"added_env_names"`
+	RemovedEnvNames    []string                `json:"removed_env_names"`
 }
 
 func (c ChangeSet) HasChanges() bool {
@@ -35,7 +35,7 @@ func (c ChangeSet) HasChanges() bool {
 // should fail when the program gains a capability, not when an old dependency
 // disappears.
 func (c ChangeSet) HasNewCapabilities() bool {
-	// Exposed ENV names are intentionally not strict by default in v0.1.
+	// Exposed ENV names are intentionally not strict by default.
 	// execve tells us that a variable was passed to the process, not that the
 	// application actually read it. The CLI can opt into strict ENV handling.
 	return len(c.AddedExecutables)+len(c.AddedReads)+len(c.AddedWrites)+len(c.AddedNetwork) > 0
