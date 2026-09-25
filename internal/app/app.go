@@ -14,7 +14,7 @@ import (
 )
 
 // Version is kept in one place so the CLI, lock file, and releases agree.
-const Version = "0.1.0"
+const Version = "0.1.1"
 
 // Exit codes used by AmbientLock. Child-process exit codes are preserved when
 // possible; these values are reserved for AmbientLock's own decisions.
