@@ -31,7 +31,6 @@ type Rules struct {
 //	exec /usr/bin/helper
 //	env CI_*
 //	network ipv4:127.0.0.1:*
-//
 func Load(path string) (Rules, error) {
 	file, err := os.Open(path)
 	if err != nil {
