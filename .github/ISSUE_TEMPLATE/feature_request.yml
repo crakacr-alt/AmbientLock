@@ -1,0 +1,23 @@
+name: Feature request
+description: Предложить новый наблюдаемый ресурс, backend или UX-улучшение
+title: "[feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какая реальная проблема решается?
+      description: Опишите сценарий, а не только желаемую кнопку.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Предлагаемое решение
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Как это проверить тестом?
+      description: Какой syscall, fixture или integration scenario докажет корректность?
