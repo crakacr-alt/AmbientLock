@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.2 — 2026-09-25
+
+Patch-релиз инфраструктуры и процесса публикации.
+
+### Added
+
+- CodeQL-анализ Go-кода;
+- Dependabot для Go modules и GitHub Actions;
+- CODEOWNERS;
+- отдельная инструкция по выпуску версий.
+
+### Changed
+
+- CI переведён на актуальные official GitHub Actions;
+- release workflow теперь использует GitHub CLI вместо стороннего publish action;
+- перед публикацией tag сверяется с версией в исходниках;
+- релиз повторно запускает vet, race tests и build;
+- README получил CI/CodeQL badges.
+
 ## 0.1.1 — 2026-09-25
 
 Небольшой patch-релиз после первого полного аудита.
