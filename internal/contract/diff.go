@@ -11,16 +11,16 @@ import (
 // "Added" capabilities are the important part for CI enforcement; "Removed" items
 // are still shown because they often explain why a dependency disappeared.
 type ChangeSet struct {
-	AddedExecutables   []string
-	RemovedExecutables []string
-	AddedReads         []string
-	RemovedReads       []string
-	AddedWrites        []string
-	RemovedWrites      []string
-	AddedNetwork       []model.NetworkEndpoint
-	RemovedNetwork     []model.NetworkEndpoint
-	AddedEnvNames      []string
-	RemovedEnvNames    []string
+	AddedExecutables   []string `json:"added_executables"`
+	RemovedExecutables []string `json:"removed_executables"`
+	AddedReads         []string `json:"added_reads"`
+	RemovedReads       []string `json:"removed_reads"`
+	AddedWrites        []string `json:"added_writes"`
+	RemovedWrites      []string `json:"removed_writes"`
+	AddedNetwork       []model.NetworkEndpoint `json:"added_network"`
+	RemovedNetwork     []model.NetworkEndpoint `json:"removed_network"`
+	AddedEnvNames      []string `json:"added_env_names"`
+	RemovedEnvNames    []string `json:"removed_env_names"`
 }
 
 func (c ChangeSet) HasChanges() bool {
