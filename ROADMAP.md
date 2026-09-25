@@ -13,10 +13,10 @@
 
 ## v0.2 — удобство реального проекта
 
-- [ ] `.ambientignore`
+- [x] `.ambientignore`
 - [x] workspace-relative path mode
 - [ ] `ambient explain <resource>`
-- [ ] JSON/SARIF report для CI
+- [x] JSON report для CI\n- [ ] SARIF annotations для GitHub Code Scanning
 - [ ] DNS correlation: IP -> hostname, когда это можно наблюдать надёжно
 - [ ] golden integration fixtures для Python/Node/Go
 

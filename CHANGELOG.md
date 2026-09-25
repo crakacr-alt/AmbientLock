@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.0 — 2026-09-25
+
+Первый функциональный релиз после MVP.
+
+### Added
+
+- `.ambientignore` с правилами для file/read/write/exec/env/network;
+- glob-поддержка `*`, `?` и `**`;
+- `--ignore FILE` и `--no-ignore`;
+- `--json-report FILE` для `diff` и `enforce`;\n- JSON report автоматически создаёт родительские каталоги;
+- машинный JSON с `changed`, `new_capabilities` и полным набором изменений.
+
+### Changed
+
+- ignore policy применяется и к baseline, и к новому запуску;\n- неполные typed-правила вроде `read` без шаблона теперь отклоняются с ошибкой;
+- schema `ambient.lock` остаётся совместимой: версия схемы не менялась.
+
 ## 0.1.2 — 2026-09-25
 
 Patch-релиз инфраструктуры и процесса публикации.

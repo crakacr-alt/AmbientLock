@@ -10,14 +10,13 @@ import (
 
 	"github.com/crakacr-alt/AmbientLock/internal/contract"
 	"github.com/crakacr-alt/AmbientLock/internal/model"
+	"github.com/crakacr-alt/AmbientLock/internal/policy"
 	"github.com/crakacr-alt/AmbientLock/internal/trace"
 )
 
 // Version is kept in one place so the CLI, lock file, and releases agree.
-const Version = "0.1.2"
+const Version = "0.2.0"
 
-// Exit codes used by AmbientLock. Child-process exit codes are preserved when
-// possible; these values are reserved for AmbientLock's own decisions.
 const (
 	ExitOK            = 0
 	ExitUsage         = 2
@@ -26,7 +25,6 @@ const (
 	ExitInternalError = 10
 )
 
-// Run is the testable CLI entry point. main() only forwards os.Args and streams.
 func Run(args []string, stdout, stderr io.Writer) int {
 	if len(args) == 0 {
 		printHelp(stdout)
@@ -59,6 +57,8 @@ func runLearn(args []string, stdout, stderr io.Writer) int {
 	flags := flag.NewFlagSet("learn", flag.ContinueOnError)
 	flags.SetOutput(stderr)
 	lockPath := flags.String("lock", "ambient.lock", "path to the lock file")
+	ignorePath, noIgnore := addIgnoreFlags(flags)
+
 	if err := flags.Parse(args); err != nil {
 		return ExitUsage
 	}
@@ -68,18 +68,30 @@ func runLearn(args []string, stdout, stderr io.Writer) int {
 		return ExitUsage
 	}
 
+	rules, err := loadIgnoreRules(flags, *ignorePath, *noIgnore)
+	if err != nil {
+		fmt.Fprintln(stderr, "ambient:", err)
+		return ExitInternalError
+	}
+
 	lock, exitCode, err := observe(command, stdout, stderr)
 	if err != nil {
 		fmt.Fprintln(stderr, "ambient:", err)
 		return ExitInternalError
 	}
+	rules.Apply(&lock)
+
 	if err := model.Save(*lockPath, lock); err != nil {
 		fmt.Fprintln(stderr, "ambient:", err)
 		return ExitInternalError
 	}
 
 	fmt.Fprintf(stdout, "\nAmbientLock learned contract -> %s\n", *lockPath)
+	if rules.Len() > 0 {
+		fmt.Fprintf(stdout, "ignore rules: %d\n", rules.Len())
+	}
 	printSummary(stdout, lock)
+
 	if exitCode != 0 {
 		fmt.Fprintf(stderr, "traced command exited with code %d; contract was still saved\n", exitCode)
 		return exitCode
@@ -92,10 +104,14 @@ func runDiff(args []string, stdout, stderr io.Writer, enforce bool) int {
 	if enforce {
 		name = "enforce"
 	}
+
 	flags := flag.NewFlagSet(name, flag.ContinueOnError)
 	flags.SetOutput(stderr)
 	lockPath := flags.String("lock", "ambient.lock", "path to the lock file")
 	strictEnv := flags.Bool("strict-env", false, "treat newly exposed ENV names as enforcement failures")
+	jsonReport := flags.String("json-report", "", "write a machine-readable diff report to this file")
+	ignorePath, noIgnore := addIgnoreFlags(flags)
+
 	if err := flags.Parse(args); err != nil {
 		return ExitUsage
 	}
@@ -103,6 +119,12 @@ func runDiff(args []string, stdout, stderr io.Writer, enforce bool) int {
 	if len(command) == 0 {
 		fmt.Fprintf(stderr, "%s requires a command after --\n", name)
 		return ExitUsage
+	}
+
+	rules, err := loadIgnoreRules(flags, *ignorePath, *noIgnore)
+	if err != nil {
+		fmt.Fprintln(stderr, "ambient:", err)
+		return ExitInternalError
 	}
 
 	baseline, err := model.Load(*lockPath)
@@ -115,7 +137,20 @@ func runDiff(args []string, stdout, stderr io.Writer, enforce bool) int {
 		fmt.Fprintln(stderr, "ambient:", err)
 		return ExitInternalError
 	}
+
+	// Apply the same policy to both sides. This also makes an old lock useful
+	// after a team introduces .ambientignore later.
+	rules.Apply(&baseline)
+	rules.Apply(&current)
 	changes := contract.Diff(baseline, current)
+	report := contract.BuildReport(changes, *strictEnv)
+
+	if *jsonReport != "" {
+		if err := contract.SaveReport(*jsonReport, report); err != nil {
+			fmt.Fprintln(stderr, "ambient:", err)
+			return ExitInternalError
+		}
+	}
 
 	fmt.Fprintln(stdout, "\nAmbient contract diff:")
 	if !changes.HasChanges() {
@@ -123,17 +158,16 @@ func runDiff(args []string, stdout, stderr io.Writer, enforce bool) int {
 	} else {
 		contract.Print(stdout, changes)
 	}
+	if *jsonReport != "" {
+		fmt.Fprintf(stdout, "JSON report: %s\n", *jsonReport)
+	}
 
 	if exitCode != 0 {
 		fmt.Fprintf(stderr, "traced command exited with code %d\n", exitCode)
 		return exitCode
 	}
 	if enforce {
-		newCapabilities := changes.HasNewCapabilities()
-		if *strictEnv && len(changes.AddedEnvNames) > 0 {
-			newCapabilities = true
-		}
-		if newCapabilities {
+		if report.NewCapabilities {
 			fmt.Fprintln(stderr, "enforce failed: new ambient capabilities detected")
 			return ExitNewCapability
 		}
@@ -164,6 +198,34 @@ func runShow(args []string, stdout, stderr io.Writer) int {
 	}
 	printSummary(stdout, lock)
 	return ExitOK
+}
+
+func addIgnoreFlags(flags *flag.FlagSet) (*string, *bool) {
+	ignorePath := flags.String("ignore", ".ambientignore", "path to ignore rules")
+	noIgnore := flags.Bool("no-ignore", false, "disable ignore rules")
+	return ignorePath, noIgnore
+}
+
+func loadIgnoreRules(flags *flag.FlagSet, path string, disabled bool) (policy.Rules, error) {
+	if disabled {
+		return policy.Rules{}, nil
+	}
+
+	explicit := false
+	flags.Visit(func(item *flag.Flag) {
+		if item.Name == "ignore" {
+			explicit = true
+		}
+	})
+
+	rules, err := policy.Load(path)
+	if err == nil {
+		return rules, nil
+	}
+	if os.IsNotExist(err) && !explicit {
+		return policy.Rules{}, nil
+	}
+	return policy.Rules{}, fmt.Errorf("load ignore rules %s: %w", path, err)
 }
 
 func observe(command []string, stdout, stderr io.Writer) (model.LockFile, int, error) {
@@ -251,20 +313,19 @@ func printHelp(w io.Writer) {
 	fmt.Fprintln(w, `AmbientLock — lock-файл для скрытых зависимостей программы.
 
 Usage:
-  ambient learn [--lock ambient.lock] -- <command> [args...]
-  ambient diff [--lock ambient.lock] [--strict-env] -- <command> [args...]
-  ambient enforce [--lock ambient.lock] [--strict-env] -- <command> [args...]
+  ambient learn [--lock ambient.lock] [--ignore .ambientignore] -- <command> [args...]
+  ambient diff [--lock ambient.lock] [--json-report report.json] [--strict-env] -- <command> [args...]
+  ambient enforce [--lock ambient.lock] [--json-report report.json] [--strict-env] -- <command> [args...]
   ambient show [--lock ambient.lock]
   ambient version
 
-Commands:
-  learn    выполнить команду под наблюдением и создать ambient.lock
-  diff     повторить запуск и показать изменения контракта
-  enforce  вернуть ошибку, если появились НОВЫЕ capabilities
-           ENV names по умолчанию только показываются; --strict-env делает их строгими
-  show     показать краткую сводку lock-файла
+Useful flags:
+  --ignore FILE       правила для шумных файлов/env/network (по умолчанию .ambientignore)
+  --no-ignore         не применять ignore-файл
+  --json-report FILE  сохранить diff в JSON для CI
+  --strict-env        считать новые ENV names новой capability
 
 Important:
-  v0.1 supports Linux + strace. "enforce" is detective: it fails after the
+  v0.2 supports Linux + strace. "enforce" is detective: it fails after the
   traced run if new capabilities were observed; it does not block syscalls yet.`)
 }
