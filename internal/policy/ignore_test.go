@@ -69,7 +69,7 @@ func TestDoubleStarMatchesDirectories(t *testing.T) {
 	}
 }
 
-func TestUnknownKindFails(t *testing.T) {
+func TestBarePatternWithSpacesIsAllowed(t *testing.T) {
 	path := filepath.Join(t.TempDir(), ".ambientignore")
 	if err := os.WriteFile(path, []byte("wat ./tmp/**\n"), 0o600); err != nil {
 		t.Fatal(err)
@@ -78,5 +78,16 @@ func TestUnknownKindFails(t *testing.T) {
 	// This protects paths that happen to contain spaces.
 	if _, err := Load(path); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestTypedRuleNeedsPattern(t *testing.T) {
+	path := filepath.Join(t.TempDir(), ".ambientignore")
+	if err := os.WriteFile(path, []byte("read\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := Load(path); err == nil {
+		t.Fatal("expected empty typed rule to fail")
 	}
 }
