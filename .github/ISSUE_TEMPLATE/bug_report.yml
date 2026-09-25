@@ -1,0 +1,34 @@
+name: Bug report
+description: Сообщить о воспроизводимой ошибке AmbientLock
+title: "[bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Спасибо. Не вставляйте токены, пароли и приватные lock-файлы целиком."
+  - type: input
+    id: version
+    attributes:
+      label: AmbientLock version
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Linux / kernel / strace
+      placeholder: Ubuntu 24.04, kernel 6.x, strace 6.x
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидаемое и фактическое поведение
+    validations:
+      required: true
