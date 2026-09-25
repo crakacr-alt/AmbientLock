@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type Report struct {
@@ -33,6 +34,10 @@ func SaveReport(path string, report Report) error {
 		return fmt.Errorf("marshal JSON report: %w", err)
 	}
 	payload = append(payload, '\n')
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return fmt.Errorf("create JSON report directory: %w", err)
+	}
 
 	if err := os.WriteFile(path, payload, 0o644); err != nil {
 		return fmt.Errorf("write JSON report: %w", err)
